@@ -1,0 +1,75 @@
+App container
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f7fa;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Kanban board layout */
+.kanban-board {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap; /* Allows columns to wrap on smaller screens */
+  max-width: 1200px; /* Maximum width for large screens */
+  width: 100%;
+}
+
+/* Kanban column styling */
+.kanban-column {
+  width: 250px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  flex-grow: 1;
+  flex-basis: 240px; /* Flex basis ensures columns are responsive */
+  transition: all 0.3s ease;
+}
+
+/* Column title */
+.kanban-column h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+}
+
+/* Kanban card styling */
+.kanban-card {
+  background-color: #009688;
+  color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect for cards */
+.kanban-card:hover {
+  background-color: #00796b; /* Slightly darker color on hover */
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .kanban-board {
+    flex-direction: column; /* Stack columns vertically on smaller screens */
+    gap: 15px;
+  }
+
+  .kanban-column {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-card {
+    font-size: 0.875rem; /* Reduce font size for smaller screens */
+  }
+}
