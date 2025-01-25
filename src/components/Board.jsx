@@ -1,80 +1,350 @@
-// import React, { useState } from 'react';
-// import { PlusCircle, X } from 'lucide-react';
+// import React, { useState, useEffect } from 'react';
+// import { DndProvider, useDrag, useDrop } from 'react-dnd';
+// import { HTML5Backend } from 'react-dnd-html5-backend';
+// import Card from './Card';
+// import { PlusCircle, X, Layout, ChevronLeft, ChevronRight } from 'lucide-react';
 // import axios from 'axios';
+// import { FaTrash, FaTrashAlt } from 'react-icons/fa';
 
-// const Board = ({ board, setBoards, activeBoard, setActiveBoard }) => {
-    
+// const API_BASE_URL = 'http://localhost:5000/api';
+// const ItemTypes = { CARD_ITEM: 'card_item' };
+
+// // Draggable Item Component
+// const DraggableItem = ({ item, cardId, boardId, onDelete }) => {
+//   const [{ isDragging }, drag] = useDrag({
+//     type: ItemTypes.CARD_ITEM,
+//     item: { id: item.id, sourceCardId: cardId, sourceBoardId: boardId },
+//     collect: (monitor) => ({
+//       isDragging: monitor.isDragging()
+//     })
+//   });
+
+//   return (
+//     <li 
+//       ref={drag}
+//       className={`flex justify-between items-center p-2 bg-gray-50 rounded ${isDragging ? 'opacity-50' : ''}`}
+//       style={{ cursor: 'move' }}
+//     >
+//       <span>{item.title}</span>
+//       <button
+//         className="text-red-500 hover:text-red-700"
+//         onClick={() => onDelete(boardId, cardId, item.id)}
+//       >
+//         <X size={14} />
+//       </button>
+//     </li>
+//   );
+// };
+
+// // Droppable Card Component
+// const DroppableCard = ({ card, boardId, onDeleteCard, onColorChange, onAddItem, addingItemTo, 
+//   newItemTitle, setAddingItemTo, setNewItemTitle, onDeleteItem, cardColors, moveItem }) => {
+  
+//   const [{ isOver }, drop] = useDrop({
+//     accept: ItemTypes.CARD_ITEM,
+//     drop: (item) => {
+//       if (item.sourceCardId !== card.id) {
+//         moveItem(item.id, item.sourceCardId, card.id, boardId);
+//       }
+//     },
+//     collect: (monitor) => ({
+//       isOver: monitor.isOver()
+//     })
+//   });
+
+//   return (
+//     <Card 
+//       ref={drop}
+//       className={`p-4 relative ${isOver ? 'border-2 border-blue-500' : ''}`}
+//       style={{ backgroundColor: card.color }}
+//     >
+//       <div className="flex justify-between items-center mb-3">
+//         <h3 className="font-semibold">{card.title}</h3>
+//         <div className="flex gap-2">
+//           <div className="relative group">
+//             <button className="p-1 hover:bg-gray-100 rounded" title="Change color">
+//               🎨
+//             </button>
+//             <div className="absolute right-0 mt-1 hidden group-hover:block bg-white shadow-lg rounded-lg p-2 z-10">
+//               <div className="flex gap-1 flex-wrap w-24">
+//                 {cardColors.map(({ id, color, name }) => (
+//                   <button
+//                     key={id}
+//                     className="w-6 h-6 rounded-full border-2 border-gray-200"
+//                     style={{ backgroundColor: color }}
+//                     onClick={() => onColorChange(boardId, card.id, color)}
+//                     title={name}
+//                   />
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//           <button
+//             className="text-blue-500 hover:text-blue-700"
+//             onClick={() => setAddingItemTo(card.id)}
+//           >
+//             <PlusCircle size={20} />
+//           </button>
+//           <button
+//             className="text-red-500 hover:text-red-700"
+//             onClick={() => onDeleteCard(boardId, card.id)}
+//           >
+//             <X size={16} />
+//           </button>
+//         </div>
+//       </div>
+
+//       {addingItemTo === card.id && (
+//         <div className="mb-3">
+//           <input
+//             type="text"
+//             value={newItemTitle}
+//             onChange={(e) => setNewItemTitle(e.target.value)}
+//             className="w-full p-2 border rounded mb-2"
+//             placeholder="Enter item..."
+//             autoFocus
+//           />
+//           <div className="flex justify-end gap-2">
+//             <button
+//               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+//               onClick={() => onAddItem(boardId, card.id)}
+//             >
+//               Add
+//             </button>
+//             <button
+//               className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+//               onClick={() => {
+//                 setAddingItemTo(null);
+//                 setNewItemTitle('');
+//               }}
+//             >
+//               Cancel
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       <ul className="space-y-2">
+//         {card.items.map(item => (
+//           <DraggableItem
+//             key={item.id}
+//             item={item}
+//             cardId={card.id}
+//             boardId={boardId}
+//             onDelete={onDeleteItem}
+//           />
+//         ))}
+//       </ul>
+//     </Card>
+//   );
+// };
+
+// const KanbanApp = () => {
+//   // Your existing state declarations
+//   const [boards, setBoards] = useState([]);
+//   const [activeBoard, setActiveBoard] = useState(null);
+//   const [isAddingBoard, setIsAddingBoard] = useState(false);
+//   const [newBoardTitle, setNewBoardTitle] = useState('');
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 //   const [addingCardTo, setAddingCardTo] = useState(null);
 //   const [newCardTitle, setNewCardTitle] = useState('');
 //   const [addingItemTo, setAddingItemTo] = useState(null);
 //   const [newItemTitle, setNewItemTitle] = useState('');
-// //   if (!board) {
-// //     return <div>Loading...</div>;
-// //   }
-// const handleAddCard = async () => {
-//     if (!newCardTitle.trim()) return;
-    
-//     const newCard = {
-//       id: Date.now().toString(),
-//       title: newCardTitle,
-//       items: []
-//     };
-  
-//     // Optimistic update: add the card to the state before the API call
-//     setBoards(prev => prev.map(b => b.id === board.id ? { ...b, cards: [...b.cards, newCard] } : b));
-    
-//     try {
-//       const response = await axios.post(`http://localhost:5000/api/boards/${board.id}/cards`, newCard);
-//       setBoards(prev => prev.map(b => b.id === board.id ? { ...b, cards: [...b.cards, response.data] } : b));
-//       setNewCardTitle('');
-//       setAddingCardTo(null);
-//     } catch (error) {
-//       console.error("Error adding card:", error);
-//     }
-//   };
-  
+//   const [selectedColor, setSelectedColor] = useState('#ffffff');
 
-//   const handleAddItem = async (cardId) => {
-//     if (!newItemTitle.trim()) return;  // Check if item title is empty
-    
-//     const newItem = {
-//       id: Date.now().toString(),  // Generate a unique ID for the new item
-//       title: newItemTitle  // Get the title from the input
-//     };
-    
+//   // Your existing cardColors array
+//   const cardColors = [
+//     { id: 1, color: '#ffffff', name: 'White' },
+//     { id: 2, color: '#fecaca', name: 'Light Pink' },
+//     { id: 3, color: '#fdba74', name: 'Light Orange' },
+//     { id: 4, color: '#bef264', name: 'Green' },
+//     { id: 5, color: '#99f6e4', name: 'Light Blue' },
+//     { id: 6, color: '#c084fc', name: 'Purple' },
+//     { id: 7, color: '#c4b5fd', name: 'Pink' },
+//     { id: 8, color: '#d1d5db', name: 'Gray' }
+//   ];
+
+//   // Add the moveItem function
+//   const moveItem = async (itemId, sourceCardId, targetCardId, boardId) => {
 //     try {
-//       // Send a POST request to add the item to the card
-//       const response = await axios.post(`http://localhost:5000/api/cards/${cardId}/items`, newItem);
-      
-//       // Update the state with the new item added to the corresponding card
-//       setBoards(prev => prev.map(b => {
-//         if (b.id === board.id) {
+//       await axios.patch(`${API_BASE_URL}/items/${itemId}/move`, {
+//         targetCardId
+//       });
+
+//       setBoards(prev => prev.map(board => {
+//         if (board.id === boardId) {
 //           return {
-//             ...b,
-//             cards: b.cards.map(c => 
-//               c.id === cardId ? { ...c, items: [...c.items, response.data] } : c
-//             )
+//             ...board,
+//             cards: board.cards.map(card => {
+//               if (card.id === sourceCardId) {
+//                 return {
+//                   ...card,
+//                   items: card.items.filter(item => item.id !== itemId)
+//                 };
+//               }
+//               if (card.id === targetCardId) {
+//                 const movedItem = board.cards
+//                   .find(c => c.id === sourceCardId)
+//                   .items.find(item => item.id === itemId);
+//                 return {
+//                   ...card,
+//                   items: [...card.items, movedItem]
+//                 };
+//               }
+//               return card;
+//             })
 //           };
 //         }
-//         return b;
+//         return board;
 //       }));
+//     } catch (error) {
+//       console.error('Error moving item:', error);
+//     }
+//   };
+//   useEffect(() => {
+//     fetchBoards();
+//   }, []);
+
+//   const fetchBoards = async () => {
+//     try {
+//       const response = await axios.get(`${API_BASE_URL}/boards`);
+//       setBoards(response.data);
+//     } catch (error) {
+//       console.error('Error fetching boards:', error);
+//     }
+//   };
+//   useEffect(() => {
+//     if (boards.length > 0) {
+//       const defaultBoard = boards.find((board) => board.title === 'MyBoard');
+//       setActiveBoard(defaultBoard?.id || boards[0].id);
+//     }
+//   }, [boards]);
+  
+//   const addNewBoard = async () => {
+//     if (!newBoardTitle.trim()) return;
+
+//     try {
+//       const response = await axios.post(`${API_BASE_URL}/boards`, {
+//         title: newBoardTitle
+//       });
+
+//       const newBoard = response.data;
+//       newBoard.cards = [];
       
-//       // Clear the input fields after successful addition
+//       setBoards(prev => [...prev, newBoard]);
+//       setActiveBoard(newBoard.id);
+//       setNewBoardTitle('');
+//       setIsAddingBoard(false);
+//     } catch (error) {
+//       console.error('Error creating board:', error);
+//     }
+//   };
+
+//   const addNewCard = async (boardId) => {
+//     if (!newCardTitle.trim()) return;
+
+//     try {
+//       const response = await axios.post(`${API_BASE_URL}/boards/${boardId}/cards`, {
+//         title: newCardTitle,
+//         color: selectedColor
+//       });
+
+//       const newCard = response.data;
+//       newCard.items = [];
+
+//       setBoards(prev => prev.map(board => {
+//         if (board.id === boardId) {
+//           return {
+//             ...board,
+//             cards: [...board.cards, newCard]
+//           };
+//         }
+//         return board;
+//       }));
+
+//       setNewCardTitle('');
+//       setAddingCardTo(null);
+//       setSelectedColor('#ffffff');
+//     } catch (error) {
+//       console.error('Error creating card:', error);
+//     }
+//   };
+
+//   const updateCardColor = async (boardId, cardId, color) => {
+//     try {
+//       const response = await axios.patch(`${API_BASE_URL}/cards/${cardId}/color`, {
+//         color
+//       });
+
+//       setBoards(prev => prev.map(board => {
+//         if (board.id === boardId) {
+//           return {
+//             ...board,
+//             cards: board.cards.map(card => {
+//               if (card.id === cardId) {
+//                 return { ...card, color: response.data.color };
+//               }
+//               return card;
+//             })
+//           };
+//         }
+//         return board;
+//       }));
+//     } catch (error) {
+//       console.error('Error updating card color:', error);
+//     }
+//   };
+
+//   const addNewItem = async (boardId, cardId) => {
+//     if (!newItemTitle.trim()) return;
+
+//     try {
+//       const response = await axios.post(`${API_BASE_URL}/cards/${cardId}/items`, {
+//         title: newItemTitle
+//       });
+
+//       const newItem = response.data;
+
+//       setBoards(prev => prev.map(board => {
+//         if (board.id === boardId) {
+//           return {
+//             ...board,
+//             cards: board.cards.map(card => {
+//               if (card.id === cardId) {
+//                 return {
+//                   ...card,
+//                   items: [...card.items, newItem]
+//                 };
+//               }
+//               return card;
+//             })
+//           };
+//         }
+//         return board;
+//       }));
+
 //       setNewItemTitle('');
 //       setAddingItemTo(null);
 //     } catch (error) {
-//       console.error("Error adding item:", error);
+//       console.error('Error creating item:', error);
 //     }
 //   };
-  
 
-//   const handleDeleteCard = async (cardId) => {
+//   const deleteBoard = async (boardId) => {
 //     try {
-//       // Send to backend to delete the card
-//       await axios.delete(`http://localhost:5000/api/cards/${cardId}`);
-//       // Update the local state by removing the card
+//       await axios.delete(`${API_BASE_URL}/boards/${boardId}`);
+//       setBoards(prev => prev.filter(b => b.id !== boardId));
+//       setActiveBoard(null);
+//     } catch (error) {
+//       console.error('Error deleting board:', error);
+//     }
+//   };
+
+//   const deleteCard = async (boardId, cardId) => {
+//     try {
+//       await axios.delete(`${API_BASE_URL}/cards/${cardId}`);
 //       setBoards(prev => prev.map(b => {
-//         if (b.id === board.id) {
+//         if (b.id === boardId) {
 //           return {
 //             ...b,
 //             cards: b.cards.filter(c => c.id !== cardId)
@@ -83,159 +353,235 @@
 //         return b;
 //       }));
 //     } catch (error) {
-//       console.error("Error deleting card:", error);
+//       console.error('Error deleting card:', error);
 //     }
 //   };
 
-//   const handleDeleteItem = async (cardId, itemId) => {
+//   const deleteItem = async (boardId, cardId, itemId) => {
 //     try {
-//       // Send to backend to delete the item
-//       await axios.delete(`http://localhost:5000/api/items/${itemId}`);
-//       // Update the local state by removing the item
+//       await axios.delete(`${API_BASE_URL}/items/${itemId}`);
 //       setBoards(prev => prev.map(b => {
-//         if (b.id === board.id) {
+//         if (b.id === boardId) {
 //           return {
 //             ...b,
-//             cards: b.cards.map(c => c.id === cardId ? { ...c, items: c.items.filter(i => i.id !== itemId) } : c)
+//             cards: b.cards.map(c => {
+//               if (c.id === cardId) {
+//                 return {
+//                   ...c,
+//                   items: c.items.filter(i => i.id !== itemId)
+//                 };
+//               }
+//               return c;
+//             })
 //           };
 //         }
 //         return b;
 //       }));
 //     } catch (error) {
-//       console.error("Error deleting item:", error);
+//       console.error('Error deleting item:', error);
 //     }
 //   };
+//   // Your existing useEffect and other functions...
+
+//   const activeboardData = boards.find(board => board.id === activeBoard);
 
 //   return (
-//     <div className="flex-1 h-screen overflow-auto p-4 md:p-6">
-//       {/* Board Header */}
-//       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sticky top-0 bg-gray-50 p-2 z-10">
-//         <h2 className="text-xl md:text-2xl font-bold">{board.title}</h2>
-//         <div className="flex gap-2 w-full sm:w-auto">
-//           <button
-//             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-//             onClick={() => setAddingCardTo(activeBoard)}
-//           >
-//             <PlusCircle size={16} />
-//             <span>Add Card</span>
-//           </button>
-//           <button
-//             className="text-red-500 hover:text-red-700 p-2"
-//             onClick={() => {
-//               setBoards(prev => prev.filter(b => b.id !== activeBoard));
-//               setActiveBoard(null);
-//             }}
-//           >
-//             <X size={20} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Add Card Form */}
-//       {addingCardTo === activeBoard && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-//           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
-//             <input
-//               type="text"
-//               value={newCardTitle}
-//               onChange={(e) => setNewCardTitle(e.target.value)}
-//               className="w-full p-2 border rounded mb-2"
-//               placeholder="Enter card title..."
-//               autoFocus
-//             />
-//             <div className="flex justify-end gap-2">
-//               <button
-//                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-//                 onClick={handleAddCard}
-//               >
-//                 Add Card
-//               </button>
-//               <button
-//                 className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-//                 onClick={() => {
-//                   setAddingCardTo(null);
-//                   setNewCardTitle('');
-//                 }}
-//               >
-//                 Cancel
-//               </button>
-//             </div>
+//     <DndProvider backend={HTML5Backend}>
+//       <div className="flex h-screen bg-gray-50">
+//         {/* Sidebar */}
+//         <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r transition-all duration-300 flex flex-col`}>
+//           <div className="p-4 border-b flex justify-between items-center">
+//             <h1 className={`font-bold ${isSidebarOpen ? 'block' : 'hidden'} text-lg`}>
+//               <Layout className="inline-block mr-2" size={20} /> Kanban Board
+//             </h1>
+//             <button
+//               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+//               className="p-1 hover:bg-gray-100 rounded"
+//             >
+//               {isSidebarOpen ? <ChevronLeft size={25} /> : <ChevronRight size={25} />}
+//             </button>
 //           </div>
+          
+//           <div className="p-4">
+//             <button
+//               onClick={() => setIsAddingBoard(true)}
+//               className="flex items-center gap-2 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+//             >
+//               <PlusCircle size={20} />
+//               {isSidebarOpen && 'New Board'}
+//             </button>
+//           </div>
+
+//           <nav className="flex-1 overflow-y-auto">
+//             {boards.map((board) => (
+//               <button
+//                 key={board.id}
+//                 onClick={() => setActiveBoard(board.id)}
+//                 className={`w-full text-left p-3 flex items-center gap-2 hover:bg-gray-100 ${
+//                   activeBoard === board.id ? 'bg-blue-50 text-blue-600' : ''
+//                 } ${board.title === 'MyBoard' ? 'font-bold text-blue-500' : ''}`}
+//               >
+//                 <div className="flex w-full justify-between items-center">
+//                   <div className="flex items-center gap-2">
+//                     <Layout size={16} />
+//                     {isSidebarOpen && (
+//                       <span className="truncate">{board.title}</span>
+//                     )}
+//                   </div>
+//                   <button
+//                     className="text-red-500 hover:text-red-700"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       deleteBoard(board.id);
+//                     }}
+//                   >
+//                     <FaTrashAlt size={13} />
+//                   </button>
+//                 </div>
+//               </button>
+//             ))}
+//           </nav>
 //         </div>
-//       )}
 
-//       {/* Cards Grid */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-min">
-//         {board.cards.map(card => (
-//           <div key={card.id} className="bg-white rounded-lg shadow-lg p-4">
-//             <div className="flex justify-between items-center mb-3">
-//               <h3 className="font-semibold truncate">{card.title}</h3>
-//               <div className="flex gap-2">
-//                 <button
-//                   className="text-blue-500 hover:text-blue-700 p-1"
-//                   onClick={() => setAddingItemTo(card.id)}
-//                 >
-//                   <PlusCircle size={16} />
-//                 </button>
-//                 <button
-//                   className="text-red-500 hover:text-red-700 p-1"
-//                   onClick={() => handleDeleteCard(card.id)}
-//                 >
-//                   <X size={16} />
-//                 </button>
-//               </div>
-//             </div>
-
-//             {/* Add Item Form */}
-//             {addingItemTo === card.id && (
-//               <div className="mb-3">
+//         {/* Main Content */}
+//         <div className="flex-1 overflow-hidden flex flex-col">
+//           {/* Add Board Form */}
+//           {isAddingBoard && (
+//             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+//               <Card className="p-4 w-full max-w-md">
+//                 <h2 className="text-xl font-bold mb-4">Create New Board</h2>
 //                 <input
 //                   type="text"
-//                   value={newItemTitle}
-//                   onChange={(e) => setNewItemTitle(e.target.value)}
-//                   className="w-full p-2 border rounded mb-2"
-//                   placeholder="Enter item..."
+//                   value={newBoardTitle}
+//                   onChange={(e) => setNewBoardTitle(e.target.value)}
+//                   className="w-full p-2 border rounded mb-4"
+//                   placeholder="Enter board title..."
 //                   autoFocus
 //                 />
 //                 <div className="flex justify-end gap-2">
 //                   <button
-//                     className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-//                     onClick={() => handleAddItem(card.id)}
+//                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+//                     onClick={addNewBoard}
 //                   >
-//                     Add
+//                     Create Board
 //                   </button>
 //                   <button
-//                     className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+//                     className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
 //                     onClick={() => {
-//                       setAddingItemTo(null);
-//                       setNewItemTitle('');
+//                       setIsAddingBoard(false);
+//                       setNewBoardTitle('');
 //                     }}
 //                   >
 //                     Cancel
 //                   </button>
 //                 </div>
-//               </div>
-//             )}
+//               </Card>
+//             </div>
+//           )}
 
-//             {/* Items List */}
-//             <ul className="space-y-2">
-//               {card.items.map(item => (
-//                 <li key={item.id} className="flex justify-between items-center p-2 bg-gray-50 rounded group">
-//                   <span className="truncate">{item.title}</span>
+//           {/* Board Content */}
+//           {activeBoard ? (
+//             <div className="flex-1 overflow-auto p-6">
+//               <div className="flex justify-between items-center mb-6">
+//                 <h2 className="text-2xl font-bold">{activeboardData?.title}</h2>
+//                 <div className="flex gap-2">
 //                   <button
-//                     className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
-//                     onClick={() => handleDeleteItem(card.id, item.id)}
+//                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+//                     onClick={() => setAddingCardTo(activeBoard)}
 //                   >
-//                     <X size={14} />
+//                     <PlusCircle size={16} />
+//                     Add Card
 //                   </button>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-//         ))}
+//                   <button
+//                     className="text-red-500 hover:text-red-700"
+//                     onClick={() => deleteBoard(activeBoard)}
+//                   >
+//                     <X size={20} />
+//                   </button>
+//                 </div>
+//               </div>
+
+//               {/* Add Card Form */}
+//               {addingCardTo === activeBoard && (
+//                 <Card className="p-4 mb-6">
+//                   <input
+//                     type="text"
+//                     value={newCardTitle}
+//                     onChange={(e) => setNewCardTitle(e.target.value)}
+//                     className="w-full p-2 border rounded mb-2"
+//                     placeholder="Enter card title..."
+//                     autoFocus
+//                   />
+//                   <div className="flex items-center gap-2 mb-4">
+//                     <span className="text-sm text-gray-500">Select card color:</span>
+//                     <div className="flex gap-2">
+//                       {cardColors.map(({ id, color, name }) => (
+//                         <button
+//                           key={id}
+//                           className={`w-6 h-6 rounded-full border-2 ${
+//                             selectedColor === color ? 'border-blue-500' : 'border-gray-200'
+//                           }`}
+//                           style={{ backgroundColor: color }}
+//                           onClick={() => setSelectedColor(color)}
+//                           title={name}
+//                         />
+//                       ))}
+//                     </div>
+//                   </div>
+//                   <div className="flex justify-end gap-2">
+//                     <button
+//                       className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+//                       onClick={() => addNewCard(activeBoard)}
+//                     >
+//                       Add Card
+//                     </button>
+//                     <button
+//                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+//                       onClick={() => {
+//                         setAddingCardTo(null);
+//                         setNewCardTitle('');
+//                         setSelectedColor('#ffffff');
+//                       }}
+//                     >
+//                       Cancel
+//                     </button>
+//                   </div>
+//                 </Card>
+//               )}
+
+//               {/* Cards Grid */}
+//               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//                 {activeboardData?.cards.map(card => (
+//                   <DroppableCard
+//                     key={card.id}
+//                     card={card}
+//                     boardId={activeBoard}
+//                     onDeleteCard={deleteCard}
+//                     onColorChange={updateCardColor}
+//                     onAddItem={addNewItem}
+//                     addingItemTo={addingItemTo}
+//                     newItemTitle={newItemTitle}
+//                     setAddingItemTo={setAddingItemTo}
+//                     setNewItemTitle={setNewItemTitle}
+//                     onDeleteItem={deleteItem}
+//                     cardColors={cardColors}
+//                     moveItem={moveItem}
+//                   />
+//                 ))}
+//               </div>
+//             </div>
+//           ) : (
+//             <div className="flex-1 flex items-center justify-center">
+//               <div className="text-center text-gray-500">
+//                 <h2 className="text-xl font-semibold mb-2">No Board Selected</h2>
+//                 <p>Create a new board or select an existing one to get started</p>
+//               </div>
+//             </div>
+//           )}
+//         </div>
 //       </div>
-//     </div>
+//     </DndProvider>
 //   );
 // };
 
-// export default Board;
+// export default KanbanApp;
