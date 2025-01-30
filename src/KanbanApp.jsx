@@ -7,7 +7,8 @@ import Sidebar from './components/Sidebar';
 import Boards from './components/Board';
 import Card from './components/Card';
 
-const API_BASE_URL = 'http://54.226.210.242:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 
 const KanbanApp = () => {
   const [boards, setBoards] = useState([]);
