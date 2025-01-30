@@ -7,7 +7,7 @@ import Sidebar from './components/Sidebar';
 import Boards from './components/Board';
 import Card from './components/Card';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL;// api
 
 
 const KanbanApp = () => {
