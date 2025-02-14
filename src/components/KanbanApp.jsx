@@ -8,7 +8,10 @@ import { PlusCircle, X, Layout, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { FaTrashAlt } from 'react-icons/fa';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const domain = "cbsl.teamob.in"; // Extracts domain dynamically
+const API_BASE_URL = `https://${domain}/gpt/route/api`;
+
 const ItemTypes = { CARD_ITEM: 'card_item' };
 const DraggableItem = ({ item, cardId, boardId, onDelete }) => {
   const [{ isDragging }, drag] = useDrag({
