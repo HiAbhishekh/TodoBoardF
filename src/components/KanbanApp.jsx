@@ -8,10 +8,7 @@ import { PlusCircle, X, Layout, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { FaTrashAlt } from 'react-icons/fa';
 
-//const API_BASE_URL = 'http://localhost:5000/api';
-const domain = "cbsl.teamob.in"; // Extracts domain dynamically
-const API_BASE_URL = `https://${domain}/gpt/route/api`;
-
+const API_BASE_URL = 'http://localhost:5000/api';
 const ItemTypes = { CARD_ITEM: 'card_item' };
 const DraggableItem = ({ item, cardId, boardId, onDelete }) => {
   const [{ isDragging }, drag] = useDrag({
@@ -741,10 +738,10 @@ import Card from './Card';
 import { PlusCircle, X, Layout, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { FaTrashAlt } from 'react-icons/fa';
+import KanbanSidebar from './sidebar';
+import KanbanLayout from './KanbanLayout';
 
-//const API_BASE_URL = 'http://localhost:5000/api';
-const domain = "cbsl.teamob.in"; // Extracts domain dynamically
-const API_BASE_URL = `https://${domain}/gpt/route/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 const ItemTypes = { CARD_ITEM: 'card_item' };
 
 const DraggableItem = ({ item, cardId, boardId, onDelete }) => {
@@ -1274,210 +1271,171 @@ const KanbanApp = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <KanbanLayout>
       <div className="flex h-screen bg-gray-50">
-     
-        <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r transition-all duration-300 flex flex-col`}>
-        <div className="p-4 border-b flex justify-between items-center">
-          <h1 className={`font-bold ${isSidebarOpen ? 'block' : 'hidden'} text-lg`}>
-            <Layout className="inline-block mr-2" size={20} /> Kanban Board
-          </h1>
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1 hover:bg-gray-100 rounded"
-          >
-            {isSidebarOpen ? <ChevronLeft size={25} /> : <ChevronRight size={25} />}
-          </button>
-        </div>
-        
-        <div className="p-4">
-          <button
-            onClick={() => setIsAddingBoard(true)}
-            className="flex items-center gap-2 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            <PlusCircle size={20} />
-            {isSidebarOpen && 'New Board'}
-          </button>
-        </div>
+        {/* Replace old sidebar with new KanbanSidebar component */}
+        <KanbanSidebar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          isAddingBoard={isAddingBoard}
+          setIsAddingBoard={setIsAddingBoard}
+          kanbanBoards={kanbanBoards}
+          activeBoard={activeBoard}
+          setActiveBoard={setActiveBoard}
+          deleteBoard={deleteBoard}
+        />
 
-        <nav className="flex-1 overflow-y-auto">
-            {kanbanBoards.map((board) => (
-              <button
-                key={board.id}
-                onClick={() => handleBoardClick(board.id)}
-                className={`w-full text-left p-3 font-bold flex items-center gap-2 hover:bg-gray-100 ${
-                  activeBoard === board.id ? 'bg-blue-50 text-blue-600' : ''
-                }`}
-              >
-                <div className="flex w-full justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Layout size={16} />
-                    {isSidebarOpen && (
-                      <span className="truncate">{board.title}</span>
-                    )}
-                  </div>
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteBoard(board.id);
-                    }}
-                  >
-                    <FaTrashAlt size={13} />
-                  </button>
-                </div>
-              </button>
-            ))}
-          </nav>
-        </div>
-
-      <div className="flex-1 overflow-hidden flex flex-col">
-      
-        {isAddingBoard && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <Card className="p-4 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">Create New Board</h2>
-              <input
-                type="text"
-                value={newBoardTitle}
-                onChange={(e) => setNewBoardTitle(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
-                placeholder="Enter board title..."
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    addNewBoard();
-                  }
-                }}
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={addNewBoard}
-                >
-                  Create Board
-                </button>
-                <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                  onClick={() => {
-                    setIsAddingBoard(false);
-                    setNewBoardTitle('');
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </Card>
-          </div>
-        )}
-
-
-        {activeBoard && activeboardData ? (
-          <div className="flex-1 overflow-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">{activeboardData?.title}</h2>
-              <div className="flex gap-2">
-                <button
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={() => setAddingCardTo(activeBoard)}
-                >
-                  <PlusCircle size={16} />
-                  Add Card
-                </button>
-                <button
-                  className="text-red-500 hover:text-red-700"
-                  onClick={() => deleteBoard(activeBoard)}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-        
-            {addingCardTo === activeBoard && (
-              <Card className="p-4 mb-6">
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Add Board Modal */}
+          {isAddingBoard && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+              <Card className="p-4 w-full max-w-md">
+                <h2 className="text-xl font-bold mb-4">Create New Board</h2>
                 <input
                   type="text"
-                  value={newCardTitle}
-                  onChange={(e) => setNewCardTitle(e.target.value)}
-                  className="w-40 p-2 border rounded mb-2"
-                  placeholder="Enter card title..."
+                  value={newBoardTitle}
+                  onChange={(e) => setNewBoardTitle(e.target.value)}
+                  className="w-full p-2 border rounded mb-4"
+                  placeholder="Enter board title..."
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      addNewCard(activeBoard);
+                      addNewBoard();
                     }
                   }}
                 />
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-sm text-gray-500">Select card color:</span>
-                  <div className="flex gap-2">
-                    {cardColors.map(({ id, color, name }) => (
-                      <button
-                        key={id}
-                        className={`w-6 h-6 rounded-full border-2 ${
-                          selectedColor === color ? 'border-blue-500' : 'border-gray-200'
-                        }`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => setSelectedColor(color)}
-                        title={name}
-                      />
-                    ))}
-                  </div>
-                </div>
                 <div className="flex justify-end gap-2">
                   <button
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    onClick={() => addNewCard(activeBoard)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    onClick={addNewBoard}
                   >
-                    Add Card
+                    Create Board
                   </button>
                   <button
-                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                     onClick={() => {
-                      setAddingCardTo(null);
-                      setNewCardTitle('');
-                      setSelectedColor('#ffffff');
+                      setIsAddingBoard(false);
+                      setNewBoardTitle('');
                     }}
                   >
                     Cancel
                   </button>
                 </div>
               </Card>
-            )}
+            </div>
+          )}
 
-          
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeboardData.cards?.map(card => (
-                <DroppableCard
-                  key={card.id}
-                  card={card}
-                  boardId={activeBoard}
-                  onDeleteCard={deleteCard}
-                  onColorChange={updateCardColor}
-                  onAddItem={addNewItem}
-                  addingItemTo={addingItemTo}
-                  newItemTitle={newItemTitle}
-                  setAddingItemTo={setAddingItemTo}
-                  setNewItemTitle={setNewItemTitle}
-                  onDeleteItem={deleteItem}
-                  cardColors={cardColors}
-                  moveItem={moveItem}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <h2 className="text-xl font-semibold mb-2">No Board Selected</h2>
-              <p>Create a new board or select an existing one to get started</p>
-            </div>
-          </div>
-        )}
+          {/* Board Content */}
+          {activeBoard && activeboardData ? (
+  <div className="flex-1 overflow-auto p-6">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold hidden md:block">
+        {activeboardData?.title}
+      </h2>
+      <div className="flex gap-2 ml-auto">
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={() => setAddingCardTo(activeBoard)}
+        >
+          <PlusCircle size={16} />
+          <span className="hidden md:inline">Add Card</span>
+        </button>
+        <button
+          className="text-red-500 hover:text-red-700"
+          onClick={() => deleteBoard(activeBoard)}
+        >
+          <X size={20} />
+        </button>
       </div>
     </div>
-  </DndProvider>
-);
+
+              {/* Add Card Form */}
+              {addingCardTo === activeBoard && (
+                <Card className="p-4 mb-6">
+                  <input
+                    type="text"
+                    value={newCardTitle}
+                    onChange={(e) => setNewCardTitle(e.target.value)}
+                    className="w-40 p-2 border rounded mb-2"
+                    placeholder="Enter card title..."
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        addNewCard(activeBoard);
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-sm text-gray-500">Select card color:</span>
+                    <div className="flex gap-2">
+                      {cardColors.map(({ id, color, name }) => (
+                        <button
+                          key={id}
+                          className={`w-6 h-6 rounded-full border-2 ${
+                            selectedColor === color ? 'border-blue-500' : 'border-gray-200'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => setSelectedColor(color)}
+                          title={name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      onClick={() => addNewCard(activeBoard)}
+                    >
+                      Add Card
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                      onClick={() => {
+                        setAddingCardTo(null);
+                        setNewCardTitle('');
+                        setSelectedColor('#ffffff');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Card>
+              )}
+
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {activeboardData.cards?.map(card => (
+                  <DroppableCard
+                    key={card.id}
+                    card={card}
+                    boardId={activeBoard}
+                    onDeleteCard={deleteCard}
+                    onColorChange={updateCardColor}
+                    onAddItem={addNewItem}
+                    addingItemTo={addingItemTo}
+                    newItemTitle={newItemTitle}
+                    setAddingItemTo={setAddingItemTo}
+                    setNewItemTitle={setNewItemTitle}
+                    onDeleteItem={deleteItem}
+                    cardColors={cardColors}
+                    moveItem={moveItem}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                <h2 className="text-xl font-semibold mb-2">No Board Selected</h2>
+                <p>Create a new board or select an existing one to get started</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      </KanbanLayout>
+    </DndProvider>
+  );
 };
 
 export default KanbanApp;

@@ -1,5 +1,5 @@
 import React from 'react';
-import KanbanApp from './components/KanbanApp.jsx';
+import KanbanApp from './KanbanApp';
 import './index.css';
 
 function App() {
