@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  
   "dependencies": {
     "axios": "^1.7.9",
     "classnames": "^2.5.1",
@@ -19,6 +20,7 @@
     "styled-components": "^6.1.14",
     "uuid": "^11.0.5",
     "web-vitals": "^4.2.4"
+  
   },
   "scripts": {
     "start": "react-scripts start",
